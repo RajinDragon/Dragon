@@ -1,4 +1,3 @@
-
 --=====================================================================
 -- party.lua   (MacroQuest + ImGui – compact button layout)
 --=====================================================================
@@ -7,6 +6,26 @@
 
 local mq   = require('mq')
 local imgui = require('ImGui')
+
+--=====================================================================
+-- DETERMINE WARP FOLDER (next to the script, not under config)
+--=====================================================================
+-- Get the full path of THIS script, strip the filename, then add "/party".
+local scriptPath = debug.getinfo(1, "S").source
+if scriptPath:sub(1,1) == "@" then
+    scriptPath = scriptPath:sub(2)         -- strip leading '@'
+end
+local scriptDir = scriptPath:match("(.+)[/\\][^/\\]+$")   -- directory of this file
+local warpFolder = scriptDir .. "/party"
+
+-- Create the folder if it does not already exist (uses LuaFileSystem, which MQ ships with)
+local lfs = require("lfs")
+if not lfs.attributes(warpFolder, "mode") then
+    local ok, err = lfs.mkdir(warpFolder)
+    if not ok then
+        mq.cmdf("/echo |cFFFF0000Failed to create warp folder %s: %s|r", warpFolder, tostring(err))
+    end
+end
 
 --=====================================================================
 -- GLOBAL SETTINGS ----------------------------------------------------
@@ -48,19 +67,7 @@ local warpFlags  = partyFlags   -- same flags for the warp window
 --=====================================================================
 -- ZONE / WARP DATABASE -----------------------------------------------
 --=====================================================================
--- All warp files are kept in <config>/lua/party/<zone>.lua
-local warpFolder = mq.configDir .. "/lua/party"
-
--- Ensure the folder exists – create it if it doesn’t.
-do
-    local ok, err = os.execute('mkdir "'..warpFolder..'"')
-    -- (On Windows the command succeeds even if the folder already exists;
-    -- on *nix you may need `mkdir -p` – adjust if you run on Linux.)
-    if not ok then
-        mq.cmdf("/echo |cFFFF0000Failed to create warp folder %s: %s|r", warpFolder, tostring(err))
-    end
-end
-
+-- Each zone gets its own file: <warpFolder>/<zone>.lua
 local zone     = mq.TLO.Zone.ShortName()
 local warpFile = warpFolder .. "/" .. zone .. ".lua"
 local warpDB   = {}
@@ -121,8 +128,8 @@ local function saveWarps()
     f:close()
 end
 
-loadWarps()                       -- load the file for the zone we start in
-local lastZone = zone              -- remember the zone for change detection
+loadWarps()                       -- load warps for the zone we started in
+local lastZone = zone              -- remember the current zone for change detection
 
 --=====================================================================
 -- CAMP FUNCTIONS ----------------------------------------------------
@@ -297,8 +304,8 @@ local function drawWarpRadial()
         dragBar()
 
         -- ==== LEFT SIDE – Set 1‑5 (angles 210‑330) ====
-        outerButton("Set2", 210, function() setWarp("warp2") end)   -- was Set1
-        outerButton("Set1", 240, function() setWarp("warp1") end)   -- was Set2
+        outerButton("Set2", 210, function() setWarp("warp2") end)   -- swapped with Set1
+        outerButton("Set1", 240, function() setWarp("warp1") end)   -- swapped with Set2
         outerButton("Set3", 180, function() setWarp("warp3") end)   -- unchanged
         outerButton("Warp1", 300, function() doWarp("warp1") end)   -- Set4 → now Warp1
         outerButton("Warp2", 330, function() doWarp("warp2") end)   -- Set5 → now Warp2
@@ -343,7 +350,7 @@ mq.bind("/reloadwarps", function()
     warpFile = warpFolder .. "/" .. zone .. ".lua"
     loadWarps()
     mq.cmdf("/echo |cFF00FF00Warps reloaded for zone %s|r", zone)
-    lastZone = zone   -- keep the change‑detector in sync
+    lastZone = zone   -- keep change‑detector in sync
 end)
 
 --=====================================================================
