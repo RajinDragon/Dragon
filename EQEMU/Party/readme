@@ -1,1 +1,14 @@
+How to install / test
+Example path on Windows:
 
+Place in lua directory 
+
+ 
+/lua run party
+/lua stop party  to stop
+
+Use /party to open the UI, set your five warp points, then zone to another area.
+
+You’ll see a new file appear in E3/MQ2/lua/party/ named after the new zone (e.g., shardslanding.lua). When you return to the original zone, its warps are loaded again automatically.
+
+Now each zone has its own persistent warp set stored in a nicely‑named file. Enjoy! 🚀
