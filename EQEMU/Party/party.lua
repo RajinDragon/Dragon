@@ -10,15 +10,11 @@ local imgui = require('ImGui')
 --=====================================================================
 -- DETERMINE WARP FOLDER (next to the script, not under config)
 --=====================================================================
--- Get the full path of THIS script, strip the filename, then add "/party".
 local scriptPath = debug.getinfo(1, "S").source
-if scriptPath:sub(1,1) == "@" then
-    scriptPath = scriptPath:sub(2)         -- strip leading '@'
-end
-local scriptDir = scriptPath:match("(.+)[/\\][^/\\]+$")   -- directory of this file
+if scriptPath:sub(1,1) == "@" then scriptPath = scriptPath:sub(2) end
+local scriptDir = scriptPath:match("(.+)[/\\][^/\\]+$")
 local warpFolder = scriptDir .. "/party"
 
--- Create the folder if it does not already exist (uses LuaFileSystem, which MQ ships with)
 local lfs = require("lfs")
 if not lfs.attributes(warpFolder, "mode") then
     local ok, err = lfs.mkdir(warpFolder)
@@ -32,29 +28,30 @@ end
 --=====================================================================
 local showUI   = true          -- /party toggles UI visibility
 local warpMode = false         -- true = warp radial, false = party radial
-local radius   = 90            -- outer radius (you asked for 90)
+local radius   = 90            -- outer radius for the radial buttons
 
 -- Centre of the UI in **screen** coordinates (used only for dragging)
 local centerX, centerY = 200, 200
 
--- ImGui window size (the window that contains everything)
-local windowSize = 400
-local windowHalf = windowSize / 2      -- 200 – centre of the ImGui window
-local winPosX, winPosY = 0, 0           -- top‑left corner of the ImGui window
-
 --=====================================================================
 -- BUTTON SIZES -------------------------------------------------------
 --=====================================================================
--- Wider small buttons (≈ 2 characters longer)
-local smallBtnW, smallBtnH = 80, 24        -- 80 × 24
--- Slightly larger central buttons (WARPS / BACK)
-local bigBtnW,   bigBtnH   = 84, 32      -- fixed width 84, height 32
+local smallBtnW, smallBtnH = 80, 24        -- 80 × 24 (wider than before)
+local bigBtnW,   bigBtnH   = 84, 32      -- 84 × 32 (centre button)
+
+--=====================================================================
+-- CALCULATE TIGHT WINDOW SIZE -----------------------------------------
+--=====================================================================
+-- Width/height of the window are based on radius + half‑button size.
+local windowWidth  = radius * 2 + smallBtnW      -- 90*2 + 80 = 260
+local windowHeight = radius * 2 + smallBtnH      -- 90*2 + 24 = 204
+local windowHalfX = windowWidth  / 2
+local windowHalfY = windowHeight / 2
 
 --=====================================================================
 -- RADIUS SETTINGS ----------------------------------------------------
 --=====================================================================
--- Inner radius for the two side‑buttons (WarpMe & Teleport)
-local innerRadius = 80          -- fixed inner radius (you asked for 80)
+local innerRadius = 80          -- inner radius for WarpMe/Teleport
 
 --=====================================================================
 -- WINDOW FLAGS -------------------------------------------------------
@@ -67,7 +64,6 @@ local warpFlags  = partyFlags   -- same flags for the warp window
 --=====================================================================
 -- ZONE / WARP DATABASE -----------------------------------------------
 --=====================================================================
--- Each zone gets its own file: <warpFolder>/<zone>.lua
 local zone     = mq.TLO.Zone.ShortName()
 local warpFile = warpFolder .. "/" .. zone .. ".lua"
 local warpDB   = {}
@@ -81,17 +77,17 @@ local function clamp(val, minv, maxv)
     else return val end
 end
 
--- Keep the ImGui window positioned around (centerX,centerY)
 local function updateWindowPos()
-    local half = windowHalf
+    local halfW = windowHalfX
+    local halfH = windowHalfY
     local screenW = mq.TLO.Window.Width()  or 1920
     local screenH = mq.TLO.Window.Height() or 1080
 
-    centerX = clamp(centerX, half, screenW - half)
-    centerY = clamp(centerY, half, screenH - half)
+    centerX = clamp(centerX, halfW, screenW - halfW)
+    centerY = clamp(centerY, halfH, screenH - halfH)
 
-    winPosX = centerX - half
-    winPosY = centerY - half
+    winPosX = centerX - halfW
+    winPosY = centerY - halfH
 end
 
 --=====================================================================
@@ -119,7 +115,6 @@ local function saveWarps()
         mq.cmdf("/echo |cFFFF0000Cannot write warp file %s|r", warpFile)
         return
     end
-
     f:write("return {\n")
     for k, v in pairs(warpDB) do
         f:write(string.format("['%s']={y=%s,x=%s,z=%s},\n", k, v.y, v.x, v.z))
@@ -128,22 +123,17 @@ local function saveWarps()
     f:close()
 end
 
-loadWarps()                       -- load warps for the zone we started in
-local lastZone = zone              -- remember the current zone for change detection
+loadWarps()
+local lastZone = zone   -- remember the zone we started in
 
 --=====================================================================
 -- CAMP FUNCTIONS ----------------------------------------------------
 --=====================================================================
 local function setCamp()
-    warpDB["camp"] = {
-        y = mq.TLO.Me.Y(),
-        x = mq.TLO.Me.X(),
-        z = mq.TLO.Me.Z()
-    }
+    warpDB["camp"] = { y = mq.TLO.Me.Y(), x = mq.TLO.Me.X(), z = mq.TLO.Me.Z() }
     saveWarps()
 end
 
--- Renamed from `returnCamp` → `WarpCamp`
 local function WarpCamp()
     local c = warpDB["camp"]
     if c then
@@ -155,11 +145,7 @@ end
 -- WARP FUNCTIONS ----------------------------------------------------
 --=====================================================================
 local function setWarp(slot)
-    warpDB[slot] = {
-        y = mq.TLO.Me.Y(),
-        x = mq.TLO.Me.X(),
-        z = mq.TLO.Me.Z()
-    }
+    warpDB[slot] = { y = mq.TLO.Me.Y(), x = mq.TLO.Me.X(), z = mq.TLO.Me.Z() }
     saveWarps()
 end
 
@@ -171,64 +157,51 @@ local function doWarp(slot)
 end
 
 local function warpToMe()
-    mq.cmdf(
-        "/e3bcaa /warp loc %s %s %s",
-        mq.TLO.Me.Y(),
-        mq.TLO.Me.X(),
-        mq.TLO.Me.Z()
-    )
+    mq.cmdf("/e3bcaa /warp loc %s %s %s", mq.TLO.Me.Y(), mq.TLO.Me.X(), mq.TLO.Me.Z())
 end
 
 --=====================================================================
 -- UI HELPERS --------------------------------------------------------
 --=====================================================================
--- Generic button drawer (coordinates are relative to the ImGui window)
 local function drawButton(label, cx, cy, w, h, command)
     imgui.SetCursorPos(cx - w/2, cy - h/2)
-    if imgui.Button(label, w, h) then
-        command()
-    end
+    if imgui.Button(label, w, h) then command() end
 end
 
--- Small button on the outer circle
 local function outerButton(label, angle, command)
     local rad = math.rad(angle)
-    local cx = windowHalf + math.cos(rad) * radius
-    local cy = windowHalf + math.sin(rad) * radius
+    local cx = windowHalfX + math.cos(rad) * radius
+    local cy = windowHalfY + math.sin(rad) * radius
     drawButton(label, cx, cy, smallBtnW, smallBtnH, command)
 end
 
--- Small button on the inner circle (WarpMe & Teleport) – kept for completeness
 local function innerButton(label, angle, command)
     local rad = math.rad(angle)
-    local cx = windowHalf + math.cos(rad) * innerRadius
-    local cy = windowHalf + math.sin(rad) * innerRadius
+    local cx = windowHalfX + math.cos(rad) * innerRadius
+    local cy = windowHalfY + math.sin(rad) * innerRadius
     drawButton(label, cx, cy, smallBtnW, smallBtnH, command)
 end
 
--- Slightly larger central button (WARPS / BACK)
 local function centreButton(label, command)
-    drawButton(label, windowHalf, windowHalf, bigBtnW, bigBtnH, command)
+    drawButton(label, windowHalfX, windowHalfY, bigBtnW, bigBtnH, command)
 end
 
--- Drag‑bar that moves **the whole** ImGui window.
-local isDragging   = false
-local lastMx, lastMy = 0, 0
-local dragBtnW, dragBtnH = 80, 16   -- width/height of the draggable bar
+local isDragging = false
+local lastMx, lastMy = 0,0
+local dragBtnW, dragBtnH = 80,16
 
 local function dragBar()
     -- Position the bar **just under** the centre button (WARPS).
-    local barX = windowHalf - dragBtnW/2
-    local barY = windowHalf + (bigBtnH/2) + 2      -- 2 px gap below the centre button
+    local barX = windowHalfX - dragBtnW/2
+    local barY = windowHalfY + (bigBtnH/2) + 2      -- 2 px gap below centre button
     imgui.SetCursorPos(barX, barY)
 
-    imgui.PushStyleColor(ImGuiCol.Button,          0.4, 0.4, 0.4, 0.35)
-    imgui.PushStyleColor(ImGuiCol.ButtonHovered,   0.7, 0.7, 0.7, 0.6)
+    imgui.PushStyleColor(ImGuiCol.Button,          0.4,0.4,0.4,0.35)
+    imgui.PushStyleColor(ImGuiCol.ButtonHovered,   0.7,0.7,0.7,0.6)
 
     imgui.Button("====", dragBtnW, dragBtnH)
 
     if imgui.IsItemActive() then
-        -- Modern ImGui – try mouse delta first.
         local ok, io = pcall(function() return imgui.GetIO() end)
         if ok and io and io.MouseDelta then
             centerX = centerX + io.MouseDelta.x
@@ -257,10 +230,10 @@ end
 --=====================================================================
 local function drawPartyRadial()
     updateWindowPos()
-    imgui.SetNextWindowPos(winPosX, winPosY, 1)   -- ImGuiCond.Always
-    imgui.SetNextWindowSize(windowSize, windowSize, 1)
+    imgui.SetNextWindowPos(winPosX, winPosY, 1)            -- ImGuiCond.Always
+    imgui.SetNextWindowSize(windowWidth, windowHeight, 1)   -- **tight size**
 
-    imgui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0)
+    imgui.PushStyleColor(ImGuiCol.WindowBg, 0,0,0,0)
 
     if imgui.Begin("PartyRadial", nil, partyFlags) then
         dragBar()
@@ -296,9 +269,9 @@ end
 local function drawWarpRadial()
     updateWindowPos()
     imgui.SetNextWindowPos(winPosX, winPosY, 1)
-    imgui.SetNextWindowSize(windowSize, windowSize, 1)
+    imgui.SetNextWindowSize(windowWidth, windowHeight, 1)   -- **tight size**
 
-    imgui.PushStyleColor(ImGuiCol.WindowBg, 0, 0, 0, 0)
+    imgui.PushStyleColor(ImGuiCol.WindowBg, 0,0,0,0)
 
     if imgui.Begin("WarpRadial", nil, warpFlags) then
         dragBar()
@@ -336,7 +309,7 @@ mq.imgui.init("partyui", function()
     else
         drawPartyRadial()
     end
-end)   -- end mq.imgui.init
+end)
 
 --=====================================================================
 -- COMMANDS -----------------------------------------------------------
@@ -350,7 +323,7 @@ mq.bind("/reloadwarps", function()
     warpFile = warpFolder .. "/" .. zone .. ".lua"
     loadWarps()
     mq.cmdf("/echo |cFF00FF00Warps reloaded for zone %s|r", zone)
-    lastZone = zone   -- keep change‑detector in sync
+    lastZone = zone
 end)
 
 --=====================================================================
