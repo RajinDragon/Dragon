@@ -469,6 +469,42 @@
     <AlignCenter>false</AlignCenter>
     <AlignRight>false</AlignRight>
   </Label>
+<!-- The Static Dash -->
+<Label item="PW_DashLabel">
+    <ScreenID>PW_DashLabel</ScreenID>
+    <RelativePosition>true</RelativePosition>
+    <Location>
+        <X>75</X> 
+        <Y>0</Y>  <!-- DECREASE THIS to move it UP -->
+    </Location>
+    <Size>
+        <CX>10</CX>
+        <CY>14</CY>
+    </Size>
+    <Text>-</Text>
+    <TextColor>
+        <R>0</R><G>255</G><B>0</B>
+    </TextColor>
+</Label>
+
+<!-- The Dynamic Class Name -->
+<Label item="PW_ClassLabel">
+    <ScreenID>PW_ClassLabel</ScreenID>
+    <EQType>3</EQType> <!-- 11 for Short Name, 12 for Full Name -->
+    <RelativePosition>true</RelativePosition>
+    <Location>
+        <X>115</X> 
+        <Y>0</Y>  <!-- MATCH THIS to the Dash Y value above -->
+    </Location>
+    <Size>
+        <CX>100</CX>
+        <CY>14</CY>
+    </Size>
+    <Text>Class</Text>
+    <TextColor>
+        <R>0</R><G>255</G><B>0</B> 
+    </TextColor>
+</Label>
   <InvSlot item="PW_InvSlot21">
     <ScreenID>InvSlot21</ScreenID>
     <!--<Font>3</Font>-->
@@ -491,104 +527,7 @@
     <Style_Transparent>false</Style_Transparent>
     <!--<TooltipReference/>-->
   </InvSlot>
-  <Button item="PW_Rewards">
-    <ScreenID>PW_Rewards</ScreenID>
-    <EQType>openwnd AAWindow</EQType>
-    <Font>1</Font>
-    <RelativePosition>true</RelativePosition>
-    <Style_Transparent>false</Style_Transparent>
-    <Style_Checkbox>true</Style_Checkbox>
-    <DecalSize>
-      <CX>30</CX>
-      <CY>24</CY>
-    </DecalSize>
-    <AutoStretch>true</AutoStretch>
-    <BottomAnchorOffset>26</BottomAnchorOffset>
-    <LeftAnchorOffset>118</LeftAnchorOffset>
-    <RightAnchorOffset>89</RightAnchorOffset>
-    <LeftAnchorToLeft>false</LeftAnchorToLeft>
-    <RightAnchorToLeft>false</RightAnchorToLeft>
-    <Text>AA</Text>
-    <TextColor>
-      <R>255</R>
-      <G>255</G>
-      <B>255</B>
-    </TextColor>
-    <ButtonDrawTemplate>
-      <Normal>A_BtnNormal</Normal>
-      <Pressed>A_BtnPressed</Pressed>
-      <Flyby>A_BtnFlyby</Flyby>
-      <Disabled>A_BtnDisabled</Disabled>
-      <PressedFlyby>A_BtnPressedFlyby</PressedFlyby>
-    </ButtonDrawTemplate>
-    <TopAnchorOffset>4</TopAnchorOffset>
-  </Button>
-  <Button item="PW_AudioTriggers">
-    <ScreenID>PW_AudioTriggers</ScreenID>
-    <EQType>openwnd AudioTriggersWindow</EQType>
-    <Font>1</Font>
-    <RelativePosition>true</RelativePosition>
-    <Style_Transparent>false</Style_Transparent>
-    <Style_Checkbox>true</Style_Checkbox>
-    <DecalSize>
-      <CX>30</CX>
-      <CY>24</CY>
-    </DecalSize>
-    <AutoStretch>true</AutoStretch>
-    <BottomAnchorOffset>26</BottomAnchorOffset>
-    <LeftAnchorOffset>87</LeftAnchorOffset>
-    <RightAnchorOffset>59</RightAnchorOffset>
-    <LeftAnchorToLeft>false</LeftAnchorToLeft>
-    <RightAnchorToLeft>false</RightAnchorToLeft>
-    <Text>AD</Text>
-    <TextColor>
-      <R>255</R>
-      <G>255</G>
-      <B>255</B>
-    </TextColor>
-    <ButtonDrawTemplate>
-      <Normal>A_BtnNormal</Normal>
-      <Pressed>A_BtnPressed</Pressed>
-      <Flyby>A_BtnFlyby</Flyby>
-      <Disabled>A_BtnDisabled</Disabled>
-      <PressedFlyby>A_BtnPressedFlyby</PressedFlyby>
-    </ButtonDrawTemplate>
-    <TopAnchorOffset>4</TopAnchorOffset>
-  </Button>
-  <Button item="PW_Expiditions">
-    <ScreenID>PW_Expiditions</ScreenID>
-    <EQType>openwnd DynamicZoneWnd</EQType>
-    <Font>1</Font>
-    <Font>2</Font>
-    <RelativePosition>true</RelativePosition>
-    <Style_Transparent>false</Style_Transparent>
-    <Style_Checkbox>true</Style_Checkbox>
-    <DecalSize>
-      <CX>30</CX>
-      <CY>24</CY>
-    </DecalSize>
-    <AutoStretch>true</AutoStretch>
-    <BottomAnchorOffset>26</BottomAnchorOffset>
-    <LeftAnchorOffset>57</LeftAnchorOffset>
-    <RightAnchorOffset>30</RightAnchorOffset>
-    <LeftAnchorToLeft>false</LeftAnchorToLeft>
-    <RightAnchorToLeft>false</RightAnchorToLeft>
-    <Text>DZ</Text>
-    <TextColor>
-      <R>255</R>
-      <G>255</G>
-      <B>255</B>
-    </TextColor>
-    <ButtonDrawTemplate>
-      <Normal>A_BtnNormal</Normal>
-      <Pressed>A_BtnPressed</Pressed>
-      <Flyby>A_BtnFlyby</Flyby>
-      <Disabled>A_BtnDisabled</Disabled>
-      <PressedFlyby>A_BtnPressedFlyby</PressedFlyby>
-    </ButtonDrawTemplate>
-    <TopAnchorOffset>4</TopAnchorOffset>
-  </Button>
-  <Gauge item="Player_HP">
+      <Gauge item="Player_HP">
     <ScreenID>PlayerHP</ScreenID>
     <RelativePosition>true</RelativePosition>
     <GaugeOffsetY>0</GaugeOffsetY>
@@ -1681,94 +1620,13 @@
 		<AlignCenter>false</AlignCenter>
 		<AlignRight>false</AlignRight>
 		<TooltipReference></TooltipReference>
-	</Label>
-  <Label item="PW_Weight">
-		<ScreenID>WeightLabel</ScreenID>
-		<RelativePosition>true</RelativePosition>
-		<Location>
-			<X>60</X>
-			<Y>105</Y>
-		</Location>
-		<Size>
-			<CX>50</CX>
-			<CY>14</CY>
-		</Size>
-		<Text>Weight</Text>
-		<TextColor>
-			<R>240</R>
-      		<G>190</G>
-      		<B>20</B>
-		</TextColor>
-		<NoWrap>true</NoWrap>
-		<AlignCenter>false</AlignCenter>
-		<AlignRight>false</AlignRight>
-		<TooltipReference></TooltipReference>
-</Label>
-<Label item="PW_CurrentWeight">
-		<ScreenID>WeightNumberLabel</ScreenID>
-		<EQType>24</EQType>
-		<RelativePosition>true</RelativePosition>
-    		<Location>
-			<X>95</X>
-			<Y>105</Y>
-		</Location>
-		<Size>
-      		<CX>30</CX>
-     			<CY>14</CY>
-    		</Size>
-    		<Text>0</Text>
-    		<TextColor>
-      		<R>255</R>
-      		<G>255</G>
-      		<B>255</B>
-    		</TextColor>
-    		<AlignRight>true</AlignRight>
-		<NoWrap>true</NoWrap>
-		<TooltipReference></TooltipReference>
-</Label>
-<Label item="PW_WeightNumber">
-		<RelativePosition>true</RelativePosition>
-    		<Location>
-			<X>130</X>
-			<Y>105</Y>
-		</Location>
-		<Size>
-      		<CX>15</CX>
-     			<CY>14</CY>
-    		</Size>
-    		<Text> / </Text>
-    		<TextColor>
-      		<R>240</R>
-      		<G>190</G>
-      		<B>20</B>
-    		</TextColor>
-    		<NoWrap>true</NoWrap>
-		<TooltipReference></TooltipReference>
-</Label>
-<Label item="PW_MaxWeight">
-		<EQType>25</EQType>
-		<RelativePosition>true</RelativePosition>
-    		<Location>
-			<X>140</X>
-			<Y>105</Y>
-		</Location>
-		<Size>
-      		<CX>30</CX>
-     			<CY>14</CY>
-    		</Size>
-    		<TextColor>
-      		<R>255</R>
-      		<G>255</G>
-      		<B>255</B>
-    		</TextColor>
-    		<NoWrap>true</NoWrap>
-		<Text />
+	
 </Label>
 <Label item="PW_ATKLabel">
     <ScreenID>PW_ATKLabel</ScreenID>
     <RelativePosition>true</RelativePosition>
     	<Location>
-			<X>180</X>
+			<X>120</X>
 			<Y>105</Y>
    	</Location>
 	<Size>
@@ -1788,7 +1646,7 @@
     <EQType>23</EQType>
     <RelativePosition>true</RelativePosition>
 		<Location>
-			<X>230</X>
+			<X>180</X>
 			<Y>105</Y>
 		</Location>
 		<Size>
@@ -2443,9 +2301,8 @@
     <Escapable>false</Escapable>
     <Pieces>PW_InvSlot21</Pieces>
     <Pieces>PW_Name</Pieces>
-    <Pieces>PW_Rewards</Pieces>
-    <Pieces>PW_AudioTriggers</Pieces>
-    <Pieces>PW_Expiditions</Pieces>
+    <Pieces>PW_DashLabel</Pieces>
+    <Pieces>PW_ClassLabel</Pieces>
     <Pieces>PW_CurrentHP</Pieces>
     <Pieces>PW_MaxHP</Pieces>
     <Pieces>PW_HPDivider</Pieces>
@@ -2500,10 +2357,6 @@
     <Pieces>A_AttackIndicatorAnimFill</Pieces>
     <Pieces>PW_ACLabel</Pieces>
     <Pieces>PW_AC</Pieces>
-    <Pieces>PW_Weight</Pieces>
-    <Pieces>PW_CurrentWeight</Pieces>
-    <Pieces>PW_WeightNumber</Pieces>
-    <Pieces>PW_MaxWeight</Pieces>
     <Pieces>PW_ATK</Pieces>
     <Pieces>PW_ATKLabel</Pieces>
     <Pieces>PW_STR</Pieces>
